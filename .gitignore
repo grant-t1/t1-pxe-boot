@@ -1,7 +1,9 @@
-.env
 tftp/iso/
 tftp/**/bootnetx64.efi
 tftp/**/bootnetaa64.efi
 tftp/snponly.efi
 tftp/snponly-arm64.efi
 tftp/undionly.kpxe
+tftp/**/initrd
+tftp/**/linux
+tftp/boot.ipxe

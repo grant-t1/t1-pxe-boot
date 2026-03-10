@@ -1,6 +1,6 @@
 # t1-pxe-boot
 
-A simplified Docker based iPXE network boot server using proxy DHCP (DNSmasq).
+A simplified Docker based iPXE network boot server using a proxy DHCP (DNSmasq) and an NGINX HTTP server (hosting ISO files)
 
 ## How it works
 
@@ -18,20 +18,21 @@ A simplified Docker based iPXE network boot server using proxy DHCP (DNSmasq).
 5. iPXE fetches boot menu from HTTP and displays it
 ```
 
-## Configuration
+## Getting Started
+
+### Server Configuration
 
 Edit `.env` before starting:
 
 ```
-INTERFACE=enp130s0       # Network interface on this machine
-SERVER_IP=10.130.1.132   # IP address of this machine
-DHCP_NETWORK=10.130.1.0  # Subnet to proxy DHCP on
+INTERFACE=eth0,enp130s0       # Network interface on this machine (while wireless is not specifically excluded most network controllers will not have a boot option for wireless)
+SERVER_IP=10.130.1.132   # IP address of the machine used to host the TFPT server and HTTP server. This will bind do the host networking as proxy configuration or virtualization will interfere with lower level broadcast packets.
+DHCP_NETWORK=10.130.1.0  # Subnet of proxy DHCP. This will not adversely affect your network. Only the DNS server is started and will incercept PXE boot requests broadcast on the network. The client will receive a response from the TFTP server and this will initiate the entire network boot process.
 ```
 
 ## Usage
 
 ```bash
-docker compose build
 docker compose up
 ```
 
@@ -41,5 +42,9 @@ docker compose up
 |------|-------------|
 | `dnsmasq/dnsmasq.conf.template` | dnsmasq config (rendered at startup via envsubst) |
 | `dnsmasq/Dockerfile` | Builds iPXE binaries from source |
+| `docker-compose.yml` | Docker compose for TFTP and HTTP containers |
+| `dnsmasq/entrypoint.sh` | Docker entrypoint shell script. Invokes the fetchall script. Creates the UEFI boot files for different platforms. |
+| `tools/fetchall.sh` | Script to fetch ISOs and extract the initrd and kernel. |
 | `http/www/boot.ipxe` | iPXE boot menu script |
 | `.env` | Network configuration |
+| `tftp/` | Directory to store all of the different OS data including the GRUB config, local, extracted initrd and kernel files as well as the generated UEFI boot configuration files |
