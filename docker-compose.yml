@@ -1,0 +1,20 @@
+services:
+  dnsmasq-tftp:
+    build:
+      context: .
+      dockerfile: dnsmasq/Dockerfile
+    network_mode: host
+    volumes:
+      - ./tftp:/tftp
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    env_file: .env
+    restart: unless-stopped
+  http:
+    image: nginx:alpine
+    network_mode: host
+    volumes:
+      - ./tftp:/usr/share/nginx/html:ro
+      - ./http/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

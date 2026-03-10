@@ -1,0 +1,41 @@
+#cloud-config
+# Ubuntu 24.04 Automated Install (subiquity autoinstall)
+# Served via TFTP — edit to match your environment
+autoinstall:
+  version: 1
+
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+
+  network:
+    network:
+      version: 2
+      ethernets:
+        any:
+          match:
+            name: "en*"
+          dhcp4: true
+
+  storage:
+    layout:
+      name: lvm
+
+  identity:
+    hostname: ubuntu
+    username: ubuntu
+    # Password: ubuntu (generate with: openssl passwd -6 ubuntu)
+    password: "$6$xyz$CHANGEME"
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  packages:
+    - openssh-server
+
+  user-data:
+    disable_root: false
+
+  late-commands:
+    - echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/ubuntu

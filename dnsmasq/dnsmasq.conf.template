@@ -1,0 +1,13 @@
+interface=${INTERFACE}
+bind-interfaces
+port=0
+dhcp-range=${DHCP_NETWORK},proxy
+enable-tftp
+tftp-root=/tftp
+dhcp-userclass=set:ipxe,iPXE
+dhcp-boot=tag:ipxe,boot.ipxe,pxeserver,${SERVER_IP}
+pxe-service=tag:!ipxe,x86PC,"Network Boot",undionly.kpxe,${SERVER_IP}
+pxe-service=tag:!ipxe,BC_EFI,"Network Boot",snponly.efi,${SERVER_IP}
+pxe-service=tag:!ipxe,x86-64_EFI,"Network Boot",snponly.efi,${SERVER_IP}
+pxe-service=tag:!ipxe,ARM64_EFI,"Network Boot",snponly-arm64.efi,${SERVER_IP}
+log-dhcp
