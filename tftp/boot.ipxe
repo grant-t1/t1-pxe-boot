@@ -1,0 +1,64 @@
+#!ipxe
+
+# iPXE Boot Menu
+# Edit this file to add or remove boot options.
+
+set menu-timeout 30000
+set menu-default local
+
+# In proxy DHCP mode, ${proxydhcp/next-server} is the address of our TFTP server.
+set tftp-server ${proxydhcp/next-server}
+
+:menu
+menu iPXE Boot Menu
+item --gap --             ---- Boot Options ----
+item ubuntu2004-amd64    Ubuntu 20.04 amd64 (netboot installer)
+item ubuntu2204-amd64    Ubuntu 22.04 amd64 (netboot installer)
+item ubuntu2204-arm64    Ubuntu 22.04 arm64 (netboot installer)
+item ubuntu2404-amd64    Ubuntu 24.04 amd64 (netboot installer)
+item ubuntu2404-arm64    Ubuntu 24.04 arm64 (netboot installer)
+item --gap --             ---- Advanced ----
+item shell               iPXE shell
+item local               Boot from local disk
+item --gap --             ----------------------------------
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto local
+goto ${selected}
+
+:ubuntu2004-amd64
+echo Loading Ubuntu 20.04 amd64 installer ...
+chain tftp://${tftp-server}/ubuntu20_04/amd64/bootnetx64.efi || goto failed
+goto menu
+
+:ubuntu2204-amd64
+echo Loading Ubuntu 22.04 amd64 installer ...
+chain tftp://${tftp-server}/ubuntu22_04/amd64/bootnetx64.efi || goto failed
+goto menu
+
+:ubuntu2204-arm64
+echo Loading Ubuntu 22.04 arm64 installer ...
+chain tftp://${tftp-server}/ubuntu22_04/arm64/bootnetaa64.efi || goto failed
+goto menu
+
+:ubuntu2404-amd64
+echo Loading Ubuntu 24.04 amd64 installer ...
+chain tftp://${tftp-server}/ubuntu24_04/amd64/bootnetx64.efi || goto failed
+goto menu
+
+:ubuntu2404-arm64
+echo Loading Ubuntu 24.04 arm64 installer ...
+chain tftp://${tftp-server}/ubuntu24_04/arm64/bootnetaa64.efi || goto failed
+goto menu
+
+:shell
+echo Entering iPXE shell. Type 'exit' to return to the menu.
+shell
+goto menu
+
+:local
+echo Booting from local disk ...
+sanboot --no-describe --drive 0x80 || exit
+
+:failed
+echo Boot failed. Press any key to return to the menu.
+prompt
+goto menu
